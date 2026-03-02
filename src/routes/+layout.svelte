@@ -2,6 +2,7 @@
 	import './layout.css';
 	import { page } from '$app/stores';
 	import { signIn, signOut } from '@auth/sveltekit/client';
+	import ToastContainer from '$lib/components/ToastContainer.svelte';
 
 	let { children } = $props();
 
@@ -75,3 +76,5 @@
 		&copy; {new Date().getFullYear()} FitTogether. Built with SvelteKit.
 	</footer>
 </div>
+
+<ToastContainer />

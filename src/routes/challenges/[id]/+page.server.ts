@@ -1,11 +1,10 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
-import { TEST_USER_ID } from '$lib';
 
 export const load: PageServerLoad = async (event) => {
 	const session = await event.locals.auth();
-	const userId = session?.user?.id ?? TEST_USER_ID;
+	const userId = session?.user?.id ?? null;
 	const challengeId = event.params.id;
 
 	const challenge = await prisma.challenge.findUnique({
@@ -23,12 +22,13 @@ export const load: PageServerLoad = async (event) => {
 	});
 
 	// Current user's entry (if joined)
-	const myEntry =
-		leaderboard.find((e) => e.userId === userId) ??
-		(await prisma.challengeEntry.findUnique({
-			where: { userId_challengeId: { userId, challengeId } },
-			include: { user: { select: { id: true, name: true, image: true } } }
-		}));
+	const myEntry = userId
+		? (leaderboard.find((e) => e.userId === userId) ??
+			(await prisma.challengeEntry.findUnique({
+				where: { userId_challengeId: { userId, challengeId } },
+				include: { user: { select: { id: true, name: true, image: true } } }
+			})))
+		: null;
 
 	return { challenge, leaderboard, myEntry };
 };

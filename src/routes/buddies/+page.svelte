@@ -1,8 +1,13 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { goto, invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { signIn } from '@auth/sveltekit/client';
+	import { toast } from '$lib/stores/toast';
 
 	let { data }: { data: PageData } = $props();
+
+	const session = $derived($page.data.session);
 
 	let activity = $state('');
 	let time = $state('');
@@ -29,6 +34,10 @@
 	let respondingTo = $state<string | null>(null);
 
 	async function sendBuddyRequest(toUserId: string) {
+		if (!session) {
+			toast.warning('Sign in to send buddy requests');
+			return;
+		}
 		sendingTo = toUserId;
 		try {
 			const res = await fetch('/api/buddies/request', {
@@ -40,7 +49,7 @@
 				await invalidateAll();
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to send request');
+				toast.error(err.message ?? 'Failed to send request');
 			}
 		} finally {
 			sendingTo = null;
@@ -59,7 +68,7 @@
 				await invalidateAll();
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to respond');
+				toast.error(err.message ?? 'Failed to respond');
 			}
 		} finally {
 			respondingTo = null;
@@ -68,7 +77,7 @@
 
 	function openWhatsApp(phone: string | null) {
 		if (!phone) {
-			alert("This user hasn't added their WhatsApp number yet.");
+			toast.info("This user hasn't added their WhatsApp number yet.");
 			return;
 		}
 		const cleaned = phone.replace(/[^\d]/g, '');
@@ -239,13 +248,20 @@
 							>
 								✗ Decline
 							</button>
-						{:else}
+						{:else if session}
 							<button
 								onclick={() => sendBuddyRequest(buddy.id)}
 								disabled={sendingTo === buddy.id}
 								class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
 							>
 								{sendingTo === buddy.id ? 'Sending…' : '🤝 Send Buddy Request'}
+							</button>
+						{:else}
+							<button
+								onclick={() => signIn('google')}
+								class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-200"
+							>
+								🔒 Sign in to connect
 							</button>
 						{/if}
 					</div>

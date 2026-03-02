@@ -1,10 +1,9 @@
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
-import { TEST_USER_ID } from '$lib';
 
 export const load: PageServerLoad = async (event) => {
 	const session = await event.locals.auth();
-	const userId = session?.user?.id ?? TEST_USER_ID;
+	const userId = session?.user?.id ?? null;
 
 	const activity = event.url.searchParams.get('activity');
 	const time = event.url.searchParams.get('time');
@@ -18,8 +17,8 @@ export const load: PageServerLoad = async (event) => {
 		where.workoutTimes = { has: time };
 	}
 
-	// Exclude current user from list
-	where.id = { not: userId };
+	// Exclude current user from list (if logged in)
+	if (userId) where.id = { not: userId };
 
 	const buddies = await prisma.user.findMany({
 		where,
@@ -37,17 +36,19 @@ export const load: PageServerLoad = async (event) => {
 	});
 
 	// Fetch all buddy requests involving the current user
-	const buddyRequests = await prisma.buddyRequest.findMany({
-		where: {
-			OR: [{ fromUserId: userId }, { toUserId: userId }]
-		},
-		select: {
-			id: true,
-			fromUserId: true,
-			toUserId: true,
-			status: true
-		}
-	});
+	const buddyRequests = userId
+		? await prisma.buddyRequest.findMany({
+				where: {
+					OR: [{ fromUserId: userId }, { toUserId: userId }]
+				},
+				select: {
+					id: true,
+					fromUserId: true,
+					toUserId: true,
+					status: true
+				}
+			})
+		: [];
 
 	// Build a map: otherUserId → { requestId, status, direction }
 	const buddyMap: Record<string, { requestId: string; status: string; isSender: boolean }> = {};

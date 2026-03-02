@@ -1,12 +1,13 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
-import { TEST_USER_ID } from '$lib';
 
 /** PATCH /api/buddies/request/[id] — Accept or reject a buddy request */
 export const PATCH: RequestHandler = async (event) => {
 	const session = await event.locals.auth();
-	const userId = session?.user?.id ?? TEST_USER_ID;
+	if (!session?.user?.id)
+		return json({ message: 'Sign in to respond to buddy requests' }, { status: 401 });
+	const userId = session.user.id;
 
 	const requestId = event.params.id;
 	const { action } = await event.request.json();

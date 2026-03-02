@@ -1,11 +1,11 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { prisma } from '$lib/server/prisma';
-import { TEST_USER_ID } from '$lib';
 
 export const POST: RequestHandler = async (event) => {
 	const session = await event.locals.auth();
-	const userId = session?.user?.id ?? TEST_USER_ID;
+	if (!session?.user?.id) return json({ message: 'Sign in to log workouts' }, { status: 401 });
+	const userId = session.user.id;
 
 	const challengeId = event.params.id;
 	const { value } = await event.request.json();

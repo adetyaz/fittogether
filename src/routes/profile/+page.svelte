@@ -1,8 +1,12 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { toast } from '$lib/stores/toast';
 
 	let { data }: { data: PageData } = $props();
+
+	const session = $derived($page.data.session);
 
 	const activityOptions = ['swim', 'gym'];
 	const timeOptions = ['morning', 'evening', 'weekend'];
@@ -42,10 +46,11 @@
 			});
 			if (res.ok) {
 				saved = true;
+				toast.success('Profile saved!');
 				setTimeout(() => (saved = false), 2000);
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to save');
+				toast.error(err.message ?? 'Failed to save');
 			}
 		} finally {
 			saving = false;
@@ -64,7 +69,7 @@
 				activeStatus = status;
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to update status');
+				toast.error(err.message ?? 'Failed to update status');
 			}
 		} finally {
 			togglingStatus = false;
@@ -83,7 +88,7 @@
 				await invalidateAll();
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to respond');
+				toast.error(err.message ?? 'Failed to respond');
 			}
 		} finally {
 			respondingTo = null;

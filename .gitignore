@@ -25,3 +25,5 @@ vite.config.ts.timestamp-*
 
 # misc
 project.md
+.vercel
+.env*.local

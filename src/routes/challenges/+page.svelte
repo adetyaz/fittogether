@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
+	import { signIn } from '@auth/sveltekit/client';
+	import { toast } from '$lib/stores/toast';
 
 	let { data }: { data: PageData } = $props();
 
@@ -8,6 +10,10 @@
 	let joiningId = $state<string | null>(null);
 
 	async function joinChallenge(id: string) {
+		if (!session) {
+			toast.warning('Sign in to join challenges');
+			return;
+		}
 		joiningId = id;
 		try {
 			const res = await fetch(`/api/challenges/${id}/join`, { method: 'POST' });
@@ -15,7 +21,7 @@
 				window.location.reload();
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to join');
+				toast.error(err.message ?? 'Failed to join');
 			}
 		} finally {
 			joiningId = null;
@@ -56,7 +62,7 @@
 							Leaderboard
 						</a>
 
-						{#if true}
+						{#if session}
 							{#if joined}
 								<span class="rounded-md bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700">
 									✓ Joined
@@ -70,6 +76,13 @@
 									{joiningId === ch.id ? 'Joining…' : 'Join'}
 								</button>
 							{/if}
+						{:else}
+							<button
+								onclick={() => signIn('google')}
+								class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-200"
+							>
+								🔒 Sign in to join
+							</button>
 						{/if}
 					</div>
 				</div>

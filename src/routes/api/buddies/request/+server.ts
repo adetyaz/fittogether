@@ -1,12 +1,13 @@
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
 import { prisma } from '$lib/server/prisma';
-import { TEST_USER_ID } from '$lib';
 
 /** POST /api/buddies/request — Send a buddy request */
 export const POST: RequestHandler = async (event) => {
 	const session = await event.locals.auth();
-	const fromUserId = session?.user?.id ?? TEST_USER_ID;
+	if (!session?.user?.id)
+		return json({ message: 'Sign in to send buddy requests' }, { status: 401 });
+	const fromUserId = session.user.id;
 
 	const { toUserId } = await event.request.json();
 	if (!toUserId) throw error(400, 'toUserId is required');
@@ -47,7 +48,9 @@ export const POST: RequestHandler = async (event) => {
 /** GET /api/buddies/request — Get buddy connection states for current user */
 export const GET: RequestHandler = async (event) => {
 	const session = await event.locals.auth();
-	const userId = session?.user?.id ?? TEST_USER_ID;
+	if (!session?.user?.id)
+		return json({ message: 'Sign in to view buddy requests' }, { status: 401 });
+	const userId = session.user.id;
 
 	const requests = await prisma.buddyRequest.findMany({
 		where: {

@@ -1,9 +1,14 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+	import { signIn } from '@auth/sveltekit/client';
+	import { toast } from '$lib/stores/toast';
 	import LocationMap from '$lib/components/LocationMap.svelte';
 
 	let { data }: { data: PageData } = $props();
+
+	const session = $derived($page.data.session);
 
 	const busyConfig: Record<
 		string,
@@ -102,7 +107,7 @@
 				window.location.reload();
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to add location');
+				toast.error(err.message ?? 'Failed to add location');
 			}
 		} finally {
 			addingPlace = null;
@@ -116,6 +121,10 @@
 
 	async function checkIn() {
 		if (!selectedLocation) return;
+		if (!session) {
+			toast.warning('Sign in to report busyness');
+			return;
+		}
 		checking = true;
 		try {
 			const res = await fetch('/api/checkins', {
@@ -127,7 +136,7 @@
 				window.location.reload();
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to check in');
+				toast.error(err.message ?? 'Failed to check in');
 			}
 		} finally {
 			checking = false;
@@ -265,7 +274,7 @@
 					<p class="mb-3 text-sm text-gray-400 italic">No reports yet — be the first!</p>
 				{/if}
 
-				{#if true}
+				{#if session}
 					{#if selectedLocation === loc.id}
 						<div class="flex items-center gap-2">
 							<select bind:value={selectedLevel} class="rounded-md border px-2 py-1 text-sm">
@@ -295,6 +304,13 @@
 							📍 Report Status
 						</button>
 					{/if}
+				{:else}
+					<button
+						onclick={() => signIn('google')}
+						class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-500 hover:bg-gray-200"
+					>
+						🔒 Sign in to report
+					</button>
 				{/if}
 			</div>
 		{/each}

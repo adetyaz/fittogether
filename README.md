@@ -2,6 +2,18 @@
 
 A community web app for local swimmers and gym-goers — crowdsourced busyness reports, buddy matching, and fitness challenges, built with SvelteKit.
 
+## Walkthrough Videos
+
+<!-- Add walkthrough videos below. Use markdown video embeds or linked thumbnails. -->
+<!-- Example: -->
+<!-- [![Demo Video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID) -->
+
+| Video | Description |
+| ----- | ----------- |
+| _Coming soon_ | Full app walkthrough |
+| _Coming soon_ | Buddy system demo |
+| _Coming soon_ | Challenges & leaderboards |
+
 ## What It Does
 
 - **Crowdsourced Busyness** — See how busy your local pool or gym is right now. Check in and report busyness levels (Low/Medium/High) with visual indicators, interactive Leaflet maps, and place search via Nominatim.

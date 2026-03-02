@@ -1,10 +1,11 @@
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
-import { TEST_USER_ID } from '$lib';
+import { redirect } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async (event) => {
 	const session = await event.locals.auth();
-	const userId = session?.user?.id ?? TEST_USER_ID;
+	if (!session?.user?.id) throw redirect(303, '/');
+	const userId = session.user.id;
 
 	const [user, incomingRequests] = await Promise.all([
 		prisma.user.findUnique({

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
+	import { signIn } from '@auth/sveltekit/client';
+	import { toast } from '$lib/stores/toast';
 
 	let { data }: { data: PageData } = $props();
 
@@ -10,6 +12,10 @@
 
 	async function logWorkout() {
 		if (logValue <= 0) return;
+		if (!session) {
+			toast.warning('Sign in to log workouts');
+			return;
+		}
 		logging = true;
 		try {
 			const res = await fetch(`/api/challenges/${data.challenge.id}/log`, {
@@ -21,7 +27,7 @@
 				window.location.reload();
 			} else {
 				const err = await res.json();
-				alert(err.message ?? 'Failed to log workout');
+				toast.error(err.message ?? 'Failed to log workout');
 			}
 		} finally {
 			logging = false;
