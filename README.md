@@ -10,7 +10,7 @@ A community web app for local swimmers and gym-goers — crowdsourced busyness r
 
 | Video | Description |
 | ----- | ----------- |
-| _Coming soon_ | Full app walkthrough |
+| [Overview](https://www.loom.com/share/6b4d1e1bd83b457b9bbb60c13cd91dcd) | Full app walkthrough |
 | _Coming soon_ | Buddy system demo |
 | _Coming soon_ | Challenges & leaderboards |
 
