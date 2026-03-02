@@ -1,0 +1,156 @@
+// FitTogether – Prisma schema
+// Uses Neon (serverless PostgreSQL) via @prisma/adapter-neon
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// Auth.js models (required by @auth/prisma-adapter)
+// ──────────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ──────────────────────────────────────────────
+// App models
+// ──────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?   // profile picture URL from Google
+
+  // FitTogether-specific fields
+  phone        String?  // WhatsApp number e.g. "+447123456789"
+  activities   String[] // e.g., ["swim", "gym"]
+  workoutTimes String[] // e.g., ["morning", "evening", "weekend"]
+  bio          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts         Account[]
+  sessions         Session[]
+  checkIns         CheckIn[]
+  buddyRequests    BuddyRequest[] @relation("UserBuddyRequests")
+  buddyOf          BuddyRequest[] @relation("BuddyOfRequests")
+  challengeEntries ChallengeEntry[]
+}
+
+model Location {
+  id        String  @id @default(cuid())
+  name      String
+  address   String?
+  latitude  Float?
+  longitude Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  checkIns CheckIn[]
+}
+
+model CheckIn {
+  id        String @id @default(cuid())
+  busyLevel String // "Low", "Medium", "High"
+
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model BuddyRequest {
+  id         String @id @default(cuid())
+  fromUserId String
+  fromUser   User   @relation("UserBuddyRequests", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId   String
+  toUser     User   @relation("BuddyOfRequests", fields: [toUserId], references: [id], onDelete: Cascade)
+  status     String @default("pending") // "pending", "accepted", "rejected"
+
+  createdAt DateTime @default(now())
+}
+
+model Challenge {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  goalType    String // "distance" or "count"
+  goalValue   Float // e.g., 5.0 for km, 10 for visits
+  unit        String // "km", "visits", "sessions"
+  startDate   DateTime?
+  endDate     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  entries ChallengeEntry[]
+}
+
+model ChallengeEntry {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  progress    Float     @default(0)
+
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  logs WorkoutLog[]
+
+  @@unique([userId, challengeId])
+}
+
+model WorkoutLog {
+  id      String         @id @default(cuid())
+  entryId String
+  entry   ChallengeEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+  value   Float // amount added (e.g., 1.5 km, 1 visit)
+
+  createdAt DateTime @default(now())
+}
