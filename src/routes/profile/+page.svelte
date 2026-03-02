@@ -1,24 +1,29 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { invalidateAll } from '$app/navigation';
 
 	let { data }: { data: PageData } = $props();
 
 	const activityOptions = ['swim', 'gym'];
 	const timeOptions = ['morning', 'evening', 'weekend'];
 
-	let activities = $state<string[]>(data.profile?.activities ?? []);
-	let workoutTimes = $state<string[]>(data.profile?.workoutTimes ?? []);
-	let phone = $state(data.profile?.phone ?? '');
-	let bio = $state(data.profile?.bio ?? '');
+	let activities = $state<string[]>([]);
+	let workoutTimes = $state<string[]>([]);
+	let phone = $state('');
+	let bio = $state('');
 	let saving = $state(false);
 	let saved = $state(false);
+	let activeStatus = $state<string | null>(null);
+	let togglingStatus = $state(false);
+	let respondingTo = $state<string | null>(null);
 
-	// Re-sync when data changes
+	// Sync with server data on load / navigation
 	$effect(() => {
 		activities = data.profile?.activities ?? [];
 		workoutTimes = data.profile?.workoutTimes ?? [];
 		phone = data.profile?.phone ?? '';
 		bio = data.profile?.bio ?? '';
+		activeStatus = data.profile?.activeStatus ?? null;
 	});
 
 	function toggleItem(arr: string[], item: string): string[] {
@@ -46,6 +51,44 @@
 			saving = false;
 		}
 	}
+
+	async function setStatus(status: string | null) {
+		togglingStatus = true;
+		try {
+			const res = await fetch('/api/users/status', {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ status })
+			});
+			if (res.ok) {
+				activeStatus = status;
+			} else {
+				const err = await res.json();
+				alert(err.message ?? 'Failed to update status');
+			}
+		} finally {
+			togglingStatus = false;
+		}
+	}
+
+	async function respondToRequest(requestId: string, action: 'accept' | 'reject') {
+		respondingTo = requestId;
+		try {
+			const res = await fetch(`/api/buddies/request/${requestId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ action })
+			});
+			if (res.ok) {
+				await invalidateAll();
+			} else {
+				const err = await res.json();
+				alert(err.message ?? 'Failed to respond');
+			}
+		} finally {
+			respondingTo = null;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -68,6 +111,116 @@
 				<p class="text-sm text-gray-500">{data.profile.email}</p>
 			</div>
 		</div>
+
+		<!-- Active Status Toggle -->
+		<div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+			<h2 class="mb-2 text-lg font-semibold">Your Status</h2>
+			<p class="mb-4 text-sm text-gray-500">
+				Set your status so buddies know when you're available to connect. Your WhatsApp number is
+				only visible to accepted buddies while you're active.
+			</p>
+			<div class="flex flex-wrap gap-3">
+				<button
+					onclick={() => setStatus(activeStatus === 'at_gym' ? null : 'at_gym')}
+					disabled={togglingStatus}
+					class="rounded-full border-2 px-5 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+					class:bg-green-600={activeStatus === 'at_gym'}
+					class:text-white={activeStatus === 'at_gym'}
+					class:border-green-600={activeStatus === 'at_gym'}
+					class:border-gray-300={activeStatus !== 'at_gym'}
+				>
+					🏋️ At the Gym
+				</button>
+				<button
+					onclick={() => setStatus(activeStatus === 'at_pool' ? null : 'at_pool')}
+					disabled={togglingStatus}
+					class="rounded-full border-2 px-5 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+					class:bg-blue-600={activeStatus === 'at_pool'}
+					class:text-white={activeStatus === 'at_pool'}
+					class:border-blue-600={activeStatus === 'at_pool'}
+					class:border-gray-300={activeStatus !== 'at_pool'}
+				>
+					🏊 At the Pool
+				</button>
+				{#if activeStatus}
+					<button
+						onclick={() => setStatus(null)}
+						disabled={togglingStatus}
+						class="rounded-full border-2 border-gray-300 px-5 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 disabled:opacity-50"
+					>
+						⚫ Go Offline
+					</button>
+				{/if}
+			</div>
+			{#if activeStatus}
+				<p class="mt-3 text-sm text-green-700">
+					✓ You're visible as <strong
+						>{activeStatus === 'at_gym' ? 'At the Gym' : 'At the Pool'}</strong
+					>. Accepted buddies can contact you.
+				</p>
+			{:else}
+				<p class="mt-3 text-sm text-gray-400">
+					You're currently offline. Buddies can't contact you via WhatsApp right now.
+				</p>
+			{/if}
+		</div>
+
+		<!-- Incoming Buddy Requests -->
+		{#if data.incomingRequests && data.incomingRequests.length > 0}
+			<div class="rounded-xl border border-yellow-200 bg-yellow-50 p-6 shadow-sm">
+				<h2 class="mb-4 text-lg font-semibold">
+					Buddy Requests
+					<span
+						class="ml-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 text-xs font-bold text-yellow-900"
+					>
+						{data.incomingRequests.length}
+					</span>
+				</h2>
+				<div class="space-y-3">
+					{#each data.incomingRequests as req}
+						<div class="flex items-center justify-between rounded-lg bg-white p-4 shadow-sm">
+							<div class="flex items-center gap-3">
+								{#if req.fromUser.image}
+									<img
+										src={req.fromUser.image}
+										alt={req.fromUser.name ?? 'User'}
+										class="h-10 w-10 rounded-full"
+									/>
+								{:else}
+									<div
+										class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700"
+									>
+										{(req.fromUser.name ?? '?')[0]}
+									</div>
+								{/if}
+								<div>
+									<p class="font-medium">{req.fromUser.name ?? 'Anonymous'}</p>
+									{#if req.fromUser.activities.length > 0}
+										<p class="text-xs text-gray-500">{req.fromUser.activities.join(', ')}</p>
+									{/if}
+								</div>
+							</div>
+							<div class="flex gap-2">
+								<button
+									onclick={() => respondToRequest(req.id, 'accept')}
+									disabled={respondingTo === req.id}
+									class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+								>
+									✓ Accept
+								</button>
+								<button
+									onclick={() => respondToRequest(req.id, 'reject')}
+									disabled={respondingTo === req.id}
+									class="rounded-md bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-50"
+								>
+									✗ Decline
+								</button>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
 
 		<!-- Edit profile -->
 		<div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">

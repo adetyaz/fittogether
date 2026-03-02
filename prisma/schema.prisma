@@ -66,6 +66,7 @@ model User {
   activities   String[] // e.g., ["swim", "gym"]
   workoutTimes String[] // e.g., ["morning", "evening", "weekend"]
   bio          String?
+  activeStatus String?  // null = offline, "at_gym", "at_pool" — controls contactability
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -79,11 +80,13 @@ model User {
 }
 
 model Location {
-  id        String  @id @default(cuid())
-  name      String
-  address   String?
-  latitude  Float?
-  longitude Float?
+  id          String  @id @default(cuid())
+  name        String
+  address     String?
+  description String?
+  type        String? // e.g. "pool", "gym", "leisure_centre"
+  latitude    Float?
+  longitude   Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
