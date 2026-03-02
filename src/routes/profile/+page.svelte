@@ -63,7 +63,7 @@
 			const res = await fetch('/api/users/status', {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ status })
+				body: JSON.stringify({ activeStatus: status })
 			});
 			if (res.ok) {
 				activeStatus = status;

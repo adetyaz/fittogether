@@ -11,7 +11,7 @@ function today(hour: number, minute = 0): Date {
 async function main() {
 	console.log('🌱 Seeding database…');
 
-	// ── 15 Users ──
+	// ── 10 Users ──
 	const users = [
 		{
 			id: 'test-user',
@@ -102,51 +102,6 @@ async function main() {
 			activities: ['gym'],
 			workoutTimes: ['morning'],
 			bio: 'Heavy lifts, early starts.'
-		},
-		{
-			id: 'user-jade',
-			name: 'Jade Thompson',
-			email: 'jade@example.com',
-			phone: '+447111000010',
-			activities: ['swim'],
-			workoutTimes: ['morning', 'weekend'],
-			bio: 'Training for a triathlon 🏅'
-		},
-		{
-			id: 'user-karl',
-			name: 'Karl Bergström',
-			email: 'karl@example.com',
-			phone: '+447111000011',
-			activities: ['gym'],
-			workoutTimes: ['evening'],
-			bio: 'Calisthenics fan.'
-		},
-		{
-			id: 'user-luna',
-			name: 'Luna Fernandez',
-			email: 'luna@example.com',
-			phone: '+447111000012',
-			activities: ['swim', 'gym'],
-			workoutTimes: ['morning'],
-			bio: 'Morning cardio then pool.'
-		},
-		{
-			id: 'user-marcus',
-			name: 'Marcus Johnson',
-			email: 'marcus@example.com',
-			phone: '+447111000013',
-			activities: ['gym'],
-			workoutTimes: ['weekend'],
-			bio: 'Weekends only, going hard.'
-		},
-		{
-			id: 'user-nadia',
-			name: 'Nadia Patel',
-			email: 'nadia@example.com',
-			phone: '+447111000014',
-			activities: ['swim'],
-			workoutTimes: ['evening', 'weekend'],
-			bio: 'Relaxing swims after work 🌊'
 		}
 	];
 
@@ -159,42 +114,57 @@ async function main() {
 	}
 	console.log(`  ✓ ${users.length} users`);
 
-	// ── Locations (with real London-area coordinates) ──
+	// ── Locations (Ilorin, Kwara State, Nigeria) ──
 	const locations = [
 		{
-			name: 'London Fields Lido',
-			address: 'London Fields Westside, London E8 3EU',
-			type: 'pool',
-			latitude: 51.5413,
-			longitude: -0.0579
+			name: 'Whitefield Hotels Limited',
+			address: 'Plot 367, Along Gerewu Road, off Western Reservoir Road, Ilorin',
+			type: 'hotel',
+			latitude: 8.492,
+			longitude: 4.538
 		},
 		{
-			name: 'PureGym London Tower Hill',
-			address: '2 Shorter St, London E1 8LP',
-			type: 'gym',
-			latitude: 51.5096,
-			longitude: -0.074
+			name: 'Solid Worth Hotel Ilorin',
+			address:
+				'2 Bello Babatunde Street, Egbejila Road Behind Agaka filling Station, Asada, Ilorin 240101',
+			type: 'hotel',
+			latitude: 8.488,
+			longitude: 4.535
 		},
 		{
-			name: 'Ironmonger Row Baths',
-			address: '1-11 Ironmonger Row, London EC1V 3QN',
-			type: 'pool',
-			latitude: 51.5273,
-			longitude: -0.0882
-		},
-		{
-			name: 'The Gym Group Stratford',
-			address: '289 High St, London E15 2TF',
-			type: 'gym',
-			latitude: 51.5418,
-			longitude: -0.0005
-		},
-		{
-			name: 'Clissold Leisure Centre',
-			address: '63 Clissold Rd, London N16 9EX',
+			name: 'Golden Sands Luxury Resorts',
+			address: 'Olohunoje Road, Off Babatunde Yinus Street, Irewolede Area Ilorin, Ilorin 240222',
 			type: 'leisure_centre',
-			latitude: 51.5614,
-			longitude: -0.0862
+			latitude: 8.499,
+			longitude: 4.545
+		},
+		{
+			name: 'SWAY FITNESS',
+			address: 'Tanke Rd, behind GTB, Junction, Ilorin 240103, Kwara',
+			type: 'gym',
+			latitude: 8.501,
+			longitude: 4.538
+		},
+		{
+			name: 'DrDreFitness',
+			address: '13 Peter Tokula Road, Doctors House',
+			type: 'gym',
+			latitude: 8.495,
+			longitude: 4.54
+		},
+		{
+			name: 'Utage Gym',
+			address: '12 Mahogany Street, Off Adelodun street, GRA',
+			type: 'gym',
+			latitude: 8.503,
+			longitude: 4.542
+		},
+		{
+			name: 'Noktel Gym',
+			address: '14 & 16 Noktel drive, off catchment road',
+			type: 'gym',
+			latitude: 8.492,
+			longitude: 4.55
 		}
 	];
 
@@ -234,34 +204,34 @@ async function main() {
 		hour: number;
 		minute: number;
 	}[] = [
-		// ── London Fields Lido ──
+		// ── Whitefield Hotels Limited ──
 		{ locationIdx: 0, userId: 'user-alice', busyLevel: 'Low', hour: 7, minute: 15 },
-		{ locationIdx: 0, userId: 'user-jade', busyLevel: 'Medium', hour: 9, minute: 30 },
-		{ locationIdx: 0, userId: 'user-diana', busyLevel: 'High', hour: 12, minute: 0 },
+		{ locationIdx: 0, userId: 'user-diana', busyLevel: 'Medium', hour: 9, minute: 30 },
+		{ locationIdx: 0, userId: 'user-charlie', busyLevel: 'High', hour: 12, minute: 0 },
 		{ locationIdx: 0, userId: 'user-fiona', busyLevel: 'Low', hour: 15, minute: 0 }, // 3pm → Low
 
-		// ── PureGym Tower Hill ──
+		// ── Solid Worth Hotel Ilorin ──
 		{ locationIdx: 1, userId: 'user-bob', busyLevel: 'Medium', hour: 6, minute: 45 },
 		{ locationIdx: 1, userId: 'user-ethan', busyLevel: 'High', hour: 8, minute: 0 },
 		{ locationIdx: 1, userId: 'user-george', busyLevel: 'High', hour: 12, minute: 30 },
 		{ locationIdx: 1, userId: 'user-ivan', busyLevel: 'Low', hour: 15, minute: 0 }, // 3pm → Low
 
-		// ── Ironmonger Row Baths ──
-		{ locationIdx: 2, userId: 'user-luna', busyLevel: 'Low', hour: 6, minute: 30 },
+		// ── Golden Sands Luxury Resorts ──
+		{ locationIdx: 2, userId: 'user-ethan', busyLevel: 'Low', hour: 6, minute: 30 },
 		{ locationIdx: 2, userId: 'user-hannah', busyLevel: 'Medium', hour: 10, minute: 0 },
-		{ locationIdx: 2, userId: 'user-nadia', busyLevel: 'High', hour: 13, minute: 0 },
+		{ locationIdx: 2, userId: 'user-diana', busyLevel: 'High', hour: 13, minute: 0 },
 		{ locationIdx: 2, userId: 'user-charlie', busyLevel: 'Low', hour: 15, minute: 0 }, // 3pm → Low
 
-		// ── The Gym Group Stratford ──
-		{ locationIdx: 3, userId: 'user-karl', busyLevel: 'Low', hour: 5, minute: 30 },
-		{ locationIdx: 3, userId: 'user-marcus', busyLevel: 'Medium', hour: 9, minute: 0 },
-		{ locationIdx: 3, userId: 'user-george', busyLevel: 'High', hour: 11, minute: 30 },
-		{ locationIdx: 3, userId: 'user-bob', busyLevel: 'Low', hour: 15, minute: 0 }, // 3pm → Low
+		// ── SWAY FITNESS ──
+		{ locationIdx: 3, userId: 'user-bob', busyLevel: 'Low', hour: 5, minute: 30 },
+		{ locationIdx: 3, userId: 'user-george', busyLevel: 'Medium', hour: 9, minute: 0 },
+		{ locationIdx: 3, userId: 'user-ivan', busyLevel: 'High', hour: 11, minute: 30 },
+		{ locationIdx: 3, userId: 'user-alice', busyLevel: 'Low', hour: 15, minute: 0 }, // 3pm → Low
 
-		// ── Clissold Leisure Centre ──
+		// ── DrDreFitness ──
 		{ locationIdx: 4, userId: 'user-charlie', busyLevel: 'Medium', hour: 7, minute: 0 },
-		{ locationIdx: 4, userId: 'user-jade', busyLevel: 'High', hour: 10, minute: 30 },
-		{ locationIdx: 4, userId: 'user-alice', busyLevel: 'Medium', hour: 13, minute: 15 },
+		{ locationIdx: 4, userId: 'user-hannah', busyLevel: 'High', hour: 10, minute: 30 },
+		{ locationIdx: 4, userId: 'user-ethan', busyLevel: 'Medium', hour: 13, minute: 15 },
 		{ locationIdx: 4, userId: 'test-user', busyLevel: 'Low', hour: 15, minute: 0 } // 3pm → Low
 	];
 
@@ -332,10 +302,8 @@ async function main() {
 	const entries: { challengeIdx: number; userId: string; progress: number }[] = [
 		// Swim 5km in a Week
 		{ challengeIdx: 0, userId: 'user-alice', progress: 4.2 },
-		{ challengeIdx: 0, userId: 'user-jade', progress: 3.1 },
 		{ challengeIdx: 0, userId: 'user-diana', progress: 5.0 },
-		{ challengeIdx: 0, userId: 'user-luna', progress: 2.8 },
-		{ challengeIdx: 0, userId: 'user-nadia', progress: 1.5 },
+		{ challengeIdx: 0, userId: 'user-hannah', progress: 2.8 },
 		{ challengeIdx: 0, userId: 'test-user', progress: 3.7 },
 
 		// 10 Gym Visits This Month
@@ -343,8 +311,6 @@ async function main() {
 		{ challengeIdx: 1, userId: 'user-ethan', progress: 10 },
 		{ challengeIdx: 1, userId: 'user-george', progress: 6 },
 		{ challengeIdx: 1, userId: 'user-ivan', progress: 4 },
-		{ challengeIdx: 1, userId: 'user-karl', progress: 7 },
-		{ challengeIdx: 1, userId: 'user-marcus', progress: 3 },
 
 		// 20 Laps Challenge
 		{ challengeIdx: 2, userId: 'user-alice', progress: 20 },
@@ -354,7 +320,7 @@ async function main() {
 
 		// Morning Warrior
 		{ challengeIdx: 3, userId: 'user-ethan', progress: 7 },
-		{ challengeIdx: 3, userId: 'user-luna', progress: 5 },
+		{ challengeIdx: 3, userId: 'user-charlie', progress: 5 },
 		{ challengeIdx: 3, userId: 'user-ivan', progress: 4 },
 		{ challengeIdx: 3, userId: 'test-user', progress: 2 }
 	];

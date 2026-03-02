@@ -32,7 +32,7 @@ export const load: PageServerLoad = async (event) => {
 			bio: true,
 			activeStatus: true
 		},
-		orderBy: { name: 'asc' }
+		orderBy: [{ activeStatus: 'desc' }, { name: 'asc' }]
 	});
 
 	// Fetch all buddy requests involving the current user
