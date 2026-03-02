@@ -8,11 +8,12 @@ A community web app for local swimmers and gym-goers — crowdsourced busyness r
 <!-- Example: -->
 <!-- [![Demo Video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID) -->
 
-| Video                                                                   | Description               |
-| ----------------------------------------------------------------------- | ------------------------- |
-| [Overview](https://www.loom.com/share/6b4d1e1bd83b457b9bbb60c13cd91dcd) | Full app walkthrough      |
-| _Coming soon_                                                           | Buddy system demo         |
-| _Coming soon_                                                           | Challenges & leaderboards |
+| Video                                                                                               | Description                              |
+| --------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| [Overview](https://www.loom.com/share/6b4d1e1bd83b457b9bbb60c13cd91dcd)                             | Full app walkthrough                     |
+| [Pool and Gym Discovery with busyness levels](https://www.loom.com/share/d6e2b228be2647dfa2ed23cc5d00d8f6) | Crowdsourced busyness reporting         |
+| [Buddies Connect](https://www.loom.com/share/4af06324df7d4bebaf3c0f77c34ffa02)                      | Buddy matching and messaging             |
+| [Challenges and Logging Data](https://www.loom.com/share/637915c5934a441aa06e558b645390e5)         | Fitness challenges & workout logging     |
 
 ## What It Does
 
